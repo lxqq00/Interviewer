@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import yaml
 
-
+out_file_name = '牛客网校招.md'
 
 try:
     with open('data.pickle', 'rb') as f:
@@ -23,25 +23,20 @@ try:
             url = re.sub(r'\?sourceSSR=\S+$', '', url)
             data_map[url] = data
         yaml_data.clear()
-        for k,v in data_map.items():
-            yaml_data.append(v)
-            print("---"*30)
-            print(str(v).replace("\\n", "\n"))
-            print("---"*30)
+        with open(out_file_name, 'w+',encoding="utf8") as f:
+            for k, v in data_map.items():
+                yaml_data.append(v)
+                print("---"*30, file=f, flush=True)
+                print(str(v).replace("\\n", "\n"), file=f, flush=True)
+                print("---"*30, file=f, flush=True)
 except Exception as e:
     yaml_data = []
-
-
-
-
 
 
 chrome_options = Options()
 chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9223")
 driver = webdriver.Chrome(chrome_options=chrome_options)
 # driver.implicitly_wait(30)
-
-
 
 
 # 1. 获取浏览器的全部标签页
@@ -61,8 +56,11 @@ def get_current_handle():
 def switch_to_window(handle):
     driver.switch_to.window(handle)
 
+
 # 4. 关闭标签页
 lock = threading.Lock()
+
+
 def close_window():
     with lock:
         # 关闭指定标签页
@@ -201,7 +199,7 @@ def main():
     while True:
         # 等待0.1秒
         time.sleep(0.1)
-        
+
         lock.acquire()
         # # 获取当前页面
         current_window_handle = get_current_handle()
